@@ -5,6 +5,7 @@ from scipy.special import logsumexp
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from scipy.special import softmax
 
+
 class UPBG(BaseEstimator, ClassifierMixin):
 
     def __init__(self, n_components, alpha=0.05, beta=0.0001, local_max_itr=50,
@@ -31,15 +32,17 @@ class UPBG(BaseEstimator, ClassifierMixin):
         words = [x for x in self.X[j].nonzero()[1]]
         log_F = np.log(self.X[j, words].toarray().T)
         log_Aj = self.log_A[j]
-        log_Bw = self.log_B[words]  
+        log_Bw = self.log_B[words]
         if self.hasitr:
+            # if False:
             pos_idx = [self.map_class_[l] for l in self.y[j] if l != -1]
         else:
-            pos_idx = self.map_class_[self.y[j]] if not self.unlabeled[j] else []
+            pos_idx = self.map_class_[
+                self.y[j]] if not self.unlabeled[j] else []
         while local_niter < self.local_max_itr:
             local_niter += 1
             oldA_j = log_Aj
-            log_C = log_Aj + log_Bw   
+            log_C = log_Aj + log_Bw
             # supervised dimensions
             log_C = self.local_supress(log_C, pos_idx)
             log_Aj = np.log(self.alpha + np.sum(np.exp(log_F + log_C), axis=0))
@@ -48,30 +51,30 @@ class UPBG(BaseEstimator, ClassifierMixin):
                 #print('convergiu itr %s' %local_niter)
                 break
         self.log_A[j] = log_Aj
-    
+
     def local_supress(self, log_C, pos_idx):
-        #if not self.unlabeled[j]:        
-        sup_log_C, inf_log_C = log_C[:,:self.n_class], log_C[:,self.n_class:] 
+        # if not self.unlabeled[j]:
+        sup_log_C, inf_log_C = log_C[:, :self.n_class], log_C[:, self.n_class:]
         if sup_log_C.shape[0] == 0:
-            return log_C         
-        if pos_idx != []:            
-            sup_log_C[:,pos_idx] = 0
+            return log_C
+        if pos_idx != []:
+            sup_log_C[:, pos_idx] = 0
         sup_log_C = sup_log_C - logsumexp(sup_log_C, axis=1, keepdims=True)
         inf_log_C = inf_log_C - logsumexp(inf_log_C, axis=1, keepdims=True)
-        log_C[:,:self.n_class], log_C[:,self.n_class:] = sup_log_C, inf_log_C
+        log_C[:, :self.n_class], log_C[:, self.n_class:] = sup_log_C, inf_log_C
         return log_C
 
     def local_supress2(self, log_C, pos_idx):
-        #if not self.unlabeled[j]:        
-        inf_log_C = log_C[:,self.n_class:] 
+        # if not self.unlabeled[j]:
+        inf_log_C = log_C[:, self.n_class:]
         nrows = inf_log_C.shape[0]
         if nrows == 0:
-            return log_C         
-        sup_log_C = np.full((nrows, self.n_class), self.log_alpha )
-        if pos_idx != -1:            
-            sup_log_C[:,pos_idx] = 0.0        
+            return log_C
+        sup_log_C = np.full((nrows, self.n_class), self.log_alpha)
+        if pos_idx != -1:
+            sup_log_C[:, pos_idx] = 0.0
         inf_log_C = inf_log_C - logsumexp(inf_log_C, axis=1, keepdims=True)
-        log_C[:,:self.n_class], log_C[:,self.n_class:] = sup_log_C, inf_log_C
+        log_C[:, :self.n_class], log_C[:, self.n_class:] = sup_log_C, inf_log_C
         return log_C
 
     def global_propag(self):
@@ -79,7 +82,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
             docs = [d for d in self.Xc[:, i].nonzero()[0]]
             log_F = np.log(self.X[docs, i].toarray())
             log_C = self.log_A[docs] + self.log_B[i]
-            log_C = log_C - logsumexp(log_C, axis=1, keepdims=True)            
+            log_C = log_C - logsumexp(log_C, axis=1, keepdims=True)
             self.log_B[i] = logsumexp(log_F + log_C, axis=0)
             #w_cls = self.map_word_class.get(i,-1)
         self.log_B = self.log_B - logsumexp(self.log_B, axis=0)
@@ -94,7 +97,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
     def fit(self, X, y):
         X, y = check_X_y(X, y, accept_sparse=True)
         self.unlabeled = (y == -1)
-        self.hasitr = hasattr(y[0], '__iter__') # has iterator for multilabel
+        self.hasitr = hasattr(y[0], '__iter__')  # has iterator for multilabel
         self.n_class = len(np.unique(y))
         self.X = X
         self.y = y
@@ -103,7 +106,13 @@ class UPBG(BaseEstimator, ClassifierMixin):
         if not self.is_fitted_:
             self._init_matrices()
             # create map of
-            for cls_id in np.unique(y):
+
+            if not 1 <= len(y.shape) <= 2:
+                raise ValueError(
+                    f"y.shape must have 1 or 2 dimensions, but has {y.shape}.")
+
+            # flatilize if needed
+            for cls_id in np.unique(y if len(y.shape) == 1 else np.ravel(y)):
                 self.map_class_.setdefault(cls_id, self.free_id.pop())
         self.bgp()
         self.components_ = np.exp(self.log_B.T)
@@ -117,11 +126,11 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
         return self
 
-    ## corrigido bug na atualização da matriz A
+    # corrigido bug na atualização da matriz A
     def transform(self, X):
-        #if not self.X != X:
+        # if not self.X != X:
         #    return np.exp(self.log_A)
-        log_A_backup, X_backup, local_max_itr_backup = self.log_A, self.X, self.local_max_itr        
+        log_A_backup, X_backup, local_max_itr_backup = self.log_A, self.X, self.local_max_itr
         unlabeled_backup = self.unlabeled
         ndocs = X.shape[0]
         self.log_A = np.full((ndocs, self.n_components), 0.0)
@@ -145,12 +154,12 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
     def bgp(self, labelled=None):
         global_niter = 0
-        while global_niter < self.global_max_itr:            
+        while global_niter < self.global_max_itr:
             for j in tqdm(range(self.ndocs), ascii=True, desc=f'docs processed (itr {global_niter})'):
                 self.local_propag(j)
-                #if not self.unlabeled[j]:
+                # if not self.unlabeled[j]:
                 #    self.supress3(j)
-            self.global_propag() 
+            self.global_propag()
             global_niter += 1
             # self.print_top_topics()
 
@@ -160,8 +169,9 @@ class UPBG(BaseEstimator, ClassifierMixin):
         #self.log_A = np.log(softmax(self.log_A[j]))
         pos_id = self.map_class_[self.y[j]]
         self.log_A[j][:self.n_class] = np.log(self.alpha)
-        self.log_A[j][pos_id] = np.max(self.log_A[j])        
-        self.log_A[j][self.n_class:] = np.log(softmax(self.log_A[j][self.n_class:]))
+        self.log_A[j][pos_id] = np.max(self.log_A[j])
+        self.log_A[j][self.n_class:] = np.log(
+            softmax(self.log_A[j][self.n_class:]))
 
     def supress2(self, j):
         #cls = self.classes_[self.y[j]]
@@ -177,7 +187,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
     def global_supress(self, i, w_cls):
         for cls in w_cls:
-            id_pos = self.map_class_.get(cls)        
+            id_pos = self.map_class_.get(cls)
             self.log_B[i][id_pos] = np.max(self.log_B)
 
     def print_top_topics(self, n_top_words=10, target_name=None):
@@ -195,7 +205,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
     def get_topics(self, n_top_words=10, feature_names=None):
         if feature_names == None:
-            feature_names = self.feature_names        
+            feature_names = self.feature_names
         l_topics = []
         for topic in self.log_B.transpose():
             l_ = [feature_names[i]
@@ -203,11 +213,11 @@ class UPBG(BaseEstimator, ClassifierMixin):
             l_topics.append(l_)
         return l_topics
 
-    #def get_selected_classes(self):
+    # def get_selected_classes(self):
         #l_ = list(self.map_class_.keys())
-        #if -1 in l_:
-            #l_.remove(-1)
-        #return l_
+        # if -1 in l_:
+        # l_.remove(-1)
+        # return l_
 
     def set_class(self, cls_id, pos_id):
         if cls_id not in self.map_class_:
