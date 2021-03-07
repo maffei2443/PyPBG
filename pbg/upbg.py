@@ -34,7 +34,6 @@ class UPBG(BaseEstimator, ClassifierMixin):
         log_Aj = self.log_A[j]
         log_Bw = self.log_B[words]
         if self.hasitr:
-            # if False:
             pos_idx = [self.map_class_[l] for l in self.y[j] if l != -1]
         else:
             pos_idx = self.map_class_[
@@ -98,7 +97,8 @@ class UPBG(BaseEstimator, ClassifierMixin):
         X, y = check_X_y(X, y, accept_sparse=True)
         self.unlabeled = (y == -1)
         self.hasitr = hasattr(y[0], '__iter__')  # has iterator for multilabel
-        self.n_class = len(np.unique(y))
+        y_flat = np.concatenate(y) if self.hasitr else y
+        self.n_class = len(np.unique(y_flat))
         self.X = X
         self.y = y
         self.Xc = X.tocsc()
@@ -106,13 +106,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
         if not self.is_fitted_:
             self._init_matrices()
             # create map of
-
-            if not 1 <= len(y.shape) <= 2:
-                raise ValueError(
-                    f"y.shape must have 1 or 2 dimensions, but has {y.shape}.")
-
-            # flatilize if needed
-            for cls_id in np.unique(y if len(y.shape) == 1 else np.ravel(y)):
+            for cls_id in np.unique(y_flat):
                 self.map_class_.setdefault(cls_id, self.free_id.pop())
         self.bgp()
         self.components_ = np.exp(self.log_B.T)
@@ -222,4 +216,4 @@ class UPBG(BaseEstimator, ClassifierMixin):
     def set_class(self, cls_id, pos_id):
         if cls_id not in self.map_class_:
             self.free_id.remove(pos_id)
-            self.map_class_[cls_id] = pos_id
+            self.map_class_[cls_id] = pos_ids
