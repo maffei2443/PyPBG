@@ -15,7 +15,7 @@ import re
 import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-
+import spacy
 
 class Loader:
 
@@ -228,64 +228,46 @@ class RandMatrices:
         return self.normalizebycolumn(B)
 
 
-class SimplePreprocessing():
+class SimplePreprocessingBR:
 
-    def __init__(self):
-        pass
 
-    def transform(self, docs):
+    def __init__(
+        self, use_nltk=True, extra_stop_words=[],
+        min_word_size=4, huge_mem=False,
+    ):
+        self.use_nltk = use_nltk
+        self.extra_stop_words = extra_stop_words
+        # self._nlp = spacy.load('pt_core_news_lg')
+        self._nlp = spacy.load('pt_core_news_sm')
+        self._stopwords = set(
+            nltk.corpus.stopwords.words('portuguese') if self.use_nltk else []
+            + extra_stop_words
+        )
+        self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
+        self._min_word_size = min_word_size
+        self._unlimited_memory = huge_mem
+
+    def transform(self, docs, unlimited_mem=False):
         tokenizer = RegexpTokenizer(r'\w+')
-        stopwords = nltk.corpus.stopwords.words('english') + ['would']
-        pattern = re.compile(r'\b(' + r'|'.join(stopwords) + r')\b\s*')
-        for idx in range(len(docs)):
-            docs[idx] = docs[idx].lower()  # Convert to lowercase.
-            docs[idx] = pattern.sub('',docs[idx])  # remove stopwords
-            docs[idx] = re.sub(r'[^a-z]',' ',docs[idx]) # remove non-alphabet characters
-            docs[idx] = tokenizer.tokenize(docs[idx])  # Split into words.
-
-        # Remove numbers, but not words that contain numbers.
-        #docs = [[token for token in doc if not token.isdigit()] for doc in docs]
-
-        # Remove words that are only one character.
-        docs = [[token for token in doc if len(token) > 3] for doc in docs]
+        
+        docs = [
+            ' '.join(re.findall(
+                r'\w{'+str(self._min_word_size)+r',}',
+                self._pattern.sub('', doc.lower()),
+                re.IGNORECASE
+            ))
+            for doc in docs
+        ]
+        
+        # whether to use or not how much memory is needed according the largest text
+        if unlimited_mem:
+            self._nlp.max_length = max(map(len, docs))
 
         # Lemmatize all words in documents.
-        lemmatizer = WordNetLemmatizer()
-        docs = [[lemmatizer.lemmatize(token) for token in doc] for doc in docs]
-        docs = [ ' '.join(doc) for doc in docs]
+        docs = [
+            ' '.join((token.lemma_ for token in self._nlp(doc))) 
+            for doc in docs if len(doc) <= self._nlp.max_length
+        ]
         return docs
 
 
-
-
-#
-#l = Loader()
-##d = l.from_arff('datasets/SyskillWebert.arff')
-#d = l.from_files('/exp/datasets/docs_rotulados/SyskillWebert-Parsed')
-#
-#import preprocessor
-#from sklearn.feature_extraction.text import CountVectorizer
-#from sklearn.datasets import fetch_20newsgroups
-#from sklearn.feature_extraction.text import TfidfTransformer
-#from sklearn.naive_bayes import MultinomialNB
-#from sklearn.linear_model import SGDClassifier
-#from sklearn.pipeline import Pipeline
-#import numpy as np
-#from sklearn import metrics
-#from sklearn.model_selection import GridSearchCV
-#
-##text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()),
-##                     ('clf', SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5, random_state=42)),])
-#
-##parameters = {'vect__ngram_range': [(1, 1), (1, 2)], 'tfidf__use_idf': (True, False), 'clf__alpha': (1e-2, 1e-3),}
-#
-#text_clf = Pipeline([('text_preproc',preprocessor.Preprocessor()), ('vect', CountVectorizer()), ('tfidf', TfidfTransformer()),
-#                     ('clf', MultinomialNB()),])
-#
-#parameters = {'vect__ngram_range': [(1, 1), (1, 2)], 'tfidf__use_idf': (True, False),}
-#
-#
-#gs_clf = GridSearchCV(text_clf, parameters,  cv=10, n_jobs=-1)
-#gs_clf = gs_clf.fit(d['corpus'], d['class_index'])
-#print(gs_clf.cv_results_)
-#

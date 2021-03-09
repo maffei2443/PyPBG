@@ -73,3 +73,13 @@ target/
 
 # Local History for Visual Studio Code
 .history/
+*.ipynb
+.gitignore
+mlruns/
+
+csv
+pbg/csv
+pbg/*.pdf
+pbg/*.pkl
+
+*.swp

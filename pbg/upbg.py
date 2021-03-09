@@ -63,18 +63,6 @@ class UPBG(BaseEstimator, ClassifierMixin):
         log_C[:, :self.n_class], log_C[:, self.n_class:] = sup_log_C, inf_log_C
         return log_C
 
-    def local_supress2(self, log_C, pos_idx):
-        # if not self.unlabeled[j]:
-        inf_log_C = log_C[:, self.n_class:]
-        nrows = inf_log_C.shape[0]
-        if nrows == 0:
-            return log_C
-        sup_log_C = np.full((nrows, self.n_class), self.log_alpha)
-        if pos_idx != -1:
-            sup_log_C[:, pos_idx] = 0.0
-        inf_log_C = inf_log_C - logsumexp(inf_log_C, axis=1, keepdims=True)
-        log_C[:, :self.n_class], log_C[:, self.n_class:] = sup_log_C, inf_log_C
-        return log_C
 
     def global_propag(self):
         for i in tqdm(range(self.nwords), ascii=True, desc='global propagation:   '):
