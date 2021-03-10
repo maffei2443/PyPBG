@@ -1,1 +1,0 @@
-Namespace(alpha=0.005, beta=0.001, global_max_itr=50, global_threshold=1e-06, lines_percentage=0.05, local_max_itr=15, local_threshold=1e-06, n_components=30, ngram_max=1, ngram_min=1)

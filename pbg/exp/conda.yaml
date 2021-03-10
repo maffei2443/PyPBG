@@ -2,11 +2,14 @@ name: jurix-mlfow
 
 channels:
   - conda-forge
-  - deafults
+  - defaults
 
 dependencies:
   - python=3.8.1
+  - pip
   - pip:
+    - jupyter
+    - nltk
     - mlflow
     - scikit-learn
     - pandas
