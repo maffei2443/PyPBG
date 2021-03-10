@@ -1,0 +1,33 @@
+name: pbg_topics
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      n_components: {type: int, default: 30}
+      alpha: {type: float, default: 0.005}
+      beta: {type: float, default: 0.001}
+      local_max_itr: {type: int, default: 15}
+      global_max_itr: {type: int, default: 50}
+      local_threshold: {type: float, default: 1e-6}
+      global_threshold: {type: float, default: 1e-6}
+      ngram_min: {type: int, default: 1}
+      ngram_max: {type: int, default: 1}
+      lines_percentage: {type: float, default: .1}
+      huge_mem: {type: bool, default: False}
+
+    command: " jupyter nbconvert --to script jurix.ipynb \
+                && python jurix.py \                
+                --n_components={n_components} \
+                --alpha={alpha} \
+                --beta={beta} \
+                --local_max_itr={local_max_itr} \
+                --global_max_itr={global_max_itr} \
+                --local_threshold={local_threshold} \
+                --global_threshold={global_threshold} \
+                --ngram_min={ngram_min} \
+                --ngram_max={ngram_max} \
+                --lines_percentage={lines_percentage} \
+                --huge_mem={huge_mem} \
+                "

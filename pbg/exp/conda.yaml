@@ -1,0 +1,14 @@
+name: jurix-mlfow
+
+channels:
+  - conda-forge
+  - deafults
+
+dependencies:
+  - python=3.8.1
+  - pip:
+    - mlflow
+    - scikit-learn
+    - pandas
+    - scipy
+    - spacy

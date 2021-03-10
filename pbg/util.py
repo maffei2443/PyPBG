@@ -237,19 +237,19 @@ class SimplePreprocessingBR:
     ):
         self.use_nltk = use_nltk
         self.extra_stop_words = extra_stop_words
-        # self._nlp = spacy.load('pt_core_news_lg')
-        self._nlp = spacy.load('pt_core_news_sm')
+        self._nlp = spacy.load('pt_core_news_lg')
+        # self._nlp = spacy.load('pt_core_news_sm')
         self._stopwords = set(
             nltk.corpus.stopwords.words('portuguese') if self.use_nltk else []
             + extra_stop_words
         )
         self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
         self._min_word_size = min_word_size
-        self._unlimited_memory = huge_mem
+        self._huge_mem = huge_mem
 
-    def transform(self, docs, unlimited_mem=False):
+    def transform(self, docs,):
         tokenizer = RegexpTokenizer(r'\w+')
-        
+
         docs = [
             ' '.join(re.findall(
                 r'\w{'+str(self._min_word_size)+r',}',
@@ -260,7 +260,7 @@ class SimplePreprocessingBR:
         ]
         
         # whether to use or not how much memory is needed according the largest text
-        if unlimited_mem:
+        if self._huge_mem:
             self._nlp.max_length = max(map(len, docs))
 
         # Lemmatize all words in documents.
