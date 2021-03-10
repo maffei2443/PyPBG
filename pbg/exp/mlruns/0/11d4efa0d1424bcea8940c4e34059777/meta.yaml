@@ -1,0 +1,15 @@
+artifact_uri: file:///home/thiagodepaulo/maffei/PyPBG/pbg/exp/mlruns/0/11d4efa0d1424bcea8940c4e34059777/artifacts
+end_time: 1615346899604
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 11d4efa0d1424bcea8940c4e34059777
+run_uuid: 11d4efa0d1424bcea8940c4e34059777
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1615346846715
+status: 4
+tags: []
+user_id: thiagodepaulo
