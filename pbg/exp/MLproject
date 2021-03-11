@@ -17,6 +17,11 @@ entry_points:
       lines_percentage: {type: float, default: .1}
       huge_mem: {type: int, default: 0}
       use_spacy: {type: int, default: 0}
+      data_size: {type: str, default: 'small'}
+      VALIDATION_DATA_PATH: {type: str, default: 'csv/validation_small.csv'}
+      TRAIN_DATA_PATH: {type: str, default: 'csv/train_small.csv'}
+      TEST_DATA_PATH: {type: str, default: 'csv/test_small.csv'}
+
 
     command: " jupyter nbconvert --to script jurix.ipynb \
                 && python jurix.py \                
@@ -32,4 +37,5 @@ entry_points:
                 --lines_percentage={lines_percentage} \
                 --huge_mem={huge_mem} \
                 --use_spacy={use_spacy} \
+                --data_size={data_size} \
                 "
