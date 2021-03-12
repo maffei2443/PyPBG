@@ -18,9 +18,6 @@ entry_points:
       huge_mem: {type: int, default: 0}
       use_spacy: {type: int, default: 0}
       data_size: {type: str, default: 'small'}
-      VALIDATION_DATA_PATH: {type: str, default: 'csv/validation_small.csv'}
-      TRAIN_DATA_PATH: {type: str, default: 'csv/train_small.csv'}
-      TEST_DATA_PATH: {type: str, default: 'csv/test_small.csv'}
 
 
     command: " jupyter nbconvert --to script jurix.ipynb \

@@ -1,4 +1,4 @@
-artifact_location: file:///home/thiagodepaulo/maffei/PyPBG/pbg/exp/mlruns/0
+artifact_location: /home/leomaffei/Desktop/projeto-ia-unb/repositories/PyPBG/pbg/exp/mlruns/0
 experiment_id: '0'
 lifecycle_stage: active
 name: Default
