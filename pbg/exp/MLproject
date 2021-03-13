@@ -8,7 +8,7 @@ entry_points:
       n_components: {type: int, default: 50}
       alpha: {type: float, default: 0.005}
       beta: {type: float, default: 0.001}
-      local_max_itr: {type: int, default: 15}
+      local_max_itr: {type: int, default: 20}
       global_max_itr: {type: int, default: 50}
       local_threshold: {type: float, default: 1e-6}
       global_threshold: {type: float, default: 1e-6}
