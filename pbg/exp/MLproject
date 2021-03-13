@@ -5,7 +5,7 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      n_components: {type: int, default: 30}
+      n_components: {type: int, default: 50}
       alpha: {type: float, default: 0.005}
       beta: {type: float, default: 0.001}
       local_max_itr: {type: int, default: 15}
@@ -14,7 +14,7 @@ entry_points:
       global_threshold: {type: float, default: 1e-6}
       ngram_min: {type: int, default: 1}
       ngram_max: {type: int, default: 1}
-      lines_percentage: {type: float, default: .1}
+      lines_percentage: {type: float, default: 1.0}
       huge_mem: {type: int, default: 0}
       use_spacy: {type: int, default: 0}
       data_size: {type: str, default: 'small'}
