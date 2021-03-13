@@ -1,0 +1,17 @@
+[{'alpha': 0.005, 'beta': 0.001, 'data_size': 'small', 'n_components': 50},
+ {'alpha': 0.005, 'beta': 0.001, 'data_size': 'small', 'n_components': 100},
+ {'alpha': 0.005, 'beta': 0.001, 'data_size': 'medium', 'n_components': 50},
+ {'alpha': 0.005, 'beta': 0.001, 'data_size': 'medium', 'n_components': 100},
+ {'alpha': 0.005, 'beta': 0.0001, 'data_size': 'small', 'n_components': 50},
+ {'alpha': 0.005, 'beta': 0.0001, 'data_size': 'small', 'n_components': 100},
+ {'alpha': 0.005, 'beta': 0.0001, 'data_size': 'medium', 'n_components': 50},
+ {'alpha': 0.005, 'beta': 0.0001, 'data_size': 'medium', 'n_components': 100},
+ {'alpha': 0.0005, 'beta': 0.001, 'data_size': 'small', 'n_components': 50},
+ {'alpha': 0.0005, 'beta': 0.001, 'data_size': 'small', 'n_components': 100},
+ {'alpha': 0.0005, 'beta': 0.001, 'data_size': 'medium', 'n_components': 50},
+ {'alpha': 0.0005, 'beta': 0.001, 'data_size': 'medium', 'n_components': 100},
+ {'alpha': 0.0005, 'beta': 0.0001, 'data_size': 'small', 'n_components': 50},
+ {'alpha': 0.0005, 'beta': 0.0001, 'data_size': 'small', 'n_components': 100},
+ {'alpha': 0.0005, 'beta': 0.0001, 'data_size': 'medium', 'n_components': 50},
+ {'alpha': 0.0005, 'beta': 0.0001, 'data_size': 'medium', 'n_components': 100}]
+
