@@ -246,8 +246,8 @@ class SimplePreprocessingBR:
         self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
         self._min_word_size = min_word_size
         self._huge_mem = huge_mem
-        self._use_spacy = use_spacy
-        print("Gonna use {} as lemmatizer!".format( 'spacy' if use_spacy else 'nltk' ))
+        # self._use_spacy = use_spacy
+        # print("Gonna use {} as lemmatizer!".format( 'spacy' if use_spacy else 'nltk' ))
 
 
     def transform(self, docs,):

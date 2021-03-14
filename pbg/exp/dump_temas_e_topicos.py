@@ -41,23 +41,27 @@ if __name__ == '__main__':
     del args
     
     for id_run in args_dict.get('id_run'):
-        m_path=f'mlruns/0/{id_run}/artifacts/pbg_model_spacy/model.pkl' 
-        m=pickle.load(open(m_path, 'rb')) 
+        try:
+            m_path=f'mlruns/0/{id_run}/artifacts/pbg_model_spacy/model.pkl' 
+            m=pickle.load(open(m_path, 'rb')) 
 
-        tema_topico = get_tema_topico(m)
-        topicos_dict_sem_tema = get_topicos_sem_tema(m)
+            tema_topico = get_tema_topico(m)
+            topicos_dict_sem_tema = get_topicos_sem_tema(m)
 
-        DUMP_FOLDER = args_dict.get('dump_folder')
-        os.makedirs(DUMP_FOLDER, exist_ok=True)
+            DUMP_FOLDER = args_dict.get('dump_folder')
+            os.makedirs(DUMP_FOLDER, exist_ok=True)
 
-        json.dump(
-            tema_topico,
-            open(f'{DUMP_FOLDER}/tema_topico_{id_run}.json', 'w'),
-                indent=4*' ', ensure_ascii=False
-        ) 
+            json.dump(
+                tema_topico,
+                open(f'{DUMP_FOLDER}/tema_topico_{id_run}.json', 'w'),
+                    indent=4*' ', ensure_ascii=False
+            ) 
 
-        json.dump(
-            topicos_dict_sem_tema,
-            open(f'{DUMP_FOLDER}/topicos_sem_tema_nltk_small_{id_run}.json', 'w'),
-                indent=4*' ', ensure_ascii=False
-        ) 
+            json.dump(
+                topicos_dict_sem_tema,
+                open(f'{DUMP_FOLDER}/topicos_sem_tema_nltk_small_{id_run}.json', 'w'),
+                    indent=4*' ', ensure_ascii=False
+            ) 
+        except Exception as e:
+            print(f"[DBG] Unexpected error `{e}` for {id_run}")
+            print("[DBG] Gonna keep the script...")
