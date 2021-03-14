@@ -16,7 +16,6 @@ entry_points:
       ngram_max: {type: int, default: 1}
       lines_percentage: {type: float, default: 1.0}
       huge_mem: {type: int, default: 0}
-      use_spacy: {type: int, default: 0}
       data_size: {type: str, default: 'small'}
 
 
@@ -33,6 +32,5 @@ entry_points:
                 --ngram_max={ngram_max} \
                 --lines_percentage={lines_percentage} \
                 --huge_mem={huge_mem} \
-                --use_spacy={use_spacy} \
                 --data_size={data_size} \
                 "

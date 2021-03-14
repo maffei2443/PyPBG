@@ -15,7 +15,7 @@ import re
 import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-import spacy
+# import spacy
 
 class Loader:
 
@@ -233,11 +233,11 @@ class SimplePreprocessingBR:
 
     def __init__(
         self, use_nltk=True, extra_stop_words=[],
-        min_word_size=4, huge_mem=False, use_spacy=True
+        min_word_size=4, huge_mem=False, **kargs
     ):
         self.use_nltk = use_nltk
         self.extra_stop_words = extra_stop_words
-        self._nlp = spacy.load('pt_core_news_lg')
+        # self._nlp = spacy.load('pt_core_news_lg')
         # self._nlp = spacy.load('pt_core_news_sm')
         self._stopwords = set(
             nltk.corpus.stopwords.words('portuguese') if self.use_nltk else []
@@ -263,21 +263,21 @@ class SimplePreprocessingBR:
         ]
         
         # whether to use or not how much memory is needed according the largest text
-        if self._huge_mem and self._use_spacy:
-            self._nlp.max_length = max(map(len, ( ' '.join(doc) for doc in docs )))
+        # if self._huge_mem and self._use_spacy:
+        #     self._nlp.max_length = max(map(len, ( ' '.join(doc) for doc in docs )))
 
         # Lemmatize all words in documents.
-        if self._use_spacy:
-            docs = [
-                ' '.join((token.lemma_ for token in self._nlp(' '.join(doc)))) 
-                for doc in docs if len(doc) <= self._nlp.max_length
-            ]
-        else:
-            lemmatizer = WordNetLemmatizer()
-            docs = [
-                ' '.join([lemmatizer.lemmatize(token) for token in doc])
-                for doc in docs
-            ]
+        # if self._use_spacy:
+        #     docs = [
+        #         ' '.join((token.lemma_ for token in self._nlp(' '.join(doc)))) 
+        #         for doc in docs if len(doc) <= self._nlp.max_length
+        #     ]
+        # else:
+        lemmatizer = WordNetLemmatizer()
+        docs = [
+            ' '.join([lemmatizer.lemmatize(token) for token in doc])
+            for doc in docs
+        ]
 
         return docs
 
