@@ -229,7 +229,7 @@ class RandMatrices:
 
 
 class SimplePreprocessingBR:
-
+    """NÃO USAR POIS CONSUME MUITA MEMÓRIA."""
 
     def __init__(
         self, use_nltk=True, extra_stop_words=[],
@@ -281,4 +281,42 @@ class SimplePreprocessingBR:
 
         return docs
 
+
+class SimplePreprocessingBR_Lite:
+
+
+    def __init__(
+        self, use_nltk=True, extra_stop_words=[],
+        min_word_size=4, huge_mem=False, **kargs
+    ):
+        self.use_nltk = use_nltk
+        self.extra_stop_words = extra_stop_words
+        # self._nlp = spacy.load('pt_core_news_lg')
+        # self._nlp = spacy.load('pt_core_news_sm')
+        self._stopwords = set(
+            nltk.corpus.stopwords.words('portuguese') if self.use_nltk else []
+            + extra_stop_words
+        )
+        self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
+        self._min_word_size = min_word_size
+        self._huge_mem = huge_mem
+        # self._use_spacy = use_spacy
+        # print("Gonna use {} as lemmatizer!".format( 'spacy' if use_spacy else 'nltk' ))
+
+
+    def transform(self, docs,):
+        tokenizer = RegexpTokenizer(r'\w+')
+        
+        docs = (
+            re.findall(
+                r'\w{'+str(self._min_word_size)+r',}',
+                self._pattern.sub('', doc.lower()),
+                re.IGNORECASE
+            )
+            for doc in docs
+        )
+
+        lemmatizer = WordNetLemmatizer()
+
+        return [' '.join([lemmatizer.lemmatize(token) for token in doc]) for doc in docs]
 
