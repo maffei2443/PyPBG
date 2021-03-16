@@ -228,58 +228,41 @@ class RandMatrices:
         return self.normalizebycolumn(B)
 
 
-class SimplePreprocessingBR:
-    """NÃO USAR POIS CONSUME MUITA MEMÓRIA."""
 
-    def __init__(
-        self, use_nltk=True, extra_stop_words=[],
-        min_word_size=4, huge_mem=False, **kargs
-    ):
+class SimplePreprocessing:
+
+    def __init__(self, use_nltk=True, extra_stop_words=[],
+        min_word_size=4, huge_mem=False, **kargs):
         self.use_nltk = use_nltk
         self.extra_stop_words = extra_stop_words
-        # self._nlp = spacy.load('pt_core_news_lg')
-        # self._nlp = spacy.load('pt_core_news_sm')
         self._stopwords = set(
             nltk.corpus.stopwords.words('portuguese') if self.use_nltk else []
             + extra_stop_words
         )
         self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
         self._min_word_size = min_word_size
-        self._huge_mem = huge_mem
-        # self._use_spacy = use_spacy
-        # print("Gonna use {} as lemmatizer!".format( 'spacy' if use_spacy else 'nltk' ))
 
 
-    def transform(self, docs,):
+    def transform(self, docs):
         tokenizer = RegexpTokenizer(r'\w+')
+        for idx in range(len(docs)):
+            docs[idx] = docs[idx].lower()  # Convert to lowercase.
+            docs[idx] = self._pattern.sub('',docs[idx])  # remove stopwords
+            docs[idx] = re.sub(r'[^a-z]',' ',docs[idx]) # remove non-alphabet characters
+            docs[idx] = tokenizer.tokenize(docs[idx])  # Split into words.
 
-        docs = [
-            re.findall(
-                r'\w{'+str(self._min_word_size)+r',}',
-                self._pattern.sub('', doc.lower()),
-                re.IGNORECASE
-            )
-            for doc in docs
-        ]
-        
-        # whether to use or not how much memory is needed according the largest text
-        # if self._huge_mem and self._use_spacy:
-        #     self._nlp.max_length = max(map(len, ( ' '.join(doc) for doc in docs )))
+        # Remove numbers, but not words that contain numbers.
+        #docs = [[token for token in doc if not token.isdigit()] for doc in docs]
+
+        # Remove words that are only one character.
+        docs = [[token for token in doc if len(token) >= self._min_word_size] for doc in docs]
 
         # Lemmatize all words in documents.
-        # if self._use_spacy:
-        #     docs = [
-        #         ' '.join((token.lemma_ for token in self._nlp(' '.join(doc)))) 
-        #         for doc in docs if len(doc) <= self._nlp.max_length
-        #     ]
-        # else:
         lemmatizer = WordNetLemmatizer()
-        docs = [
-            ' '.join([lemmatizer.lemmatize(token) for token in doc])
-            for doc in docs
-        ]
-
+        docs = [[lemmatizer.lemmatize(token) for token in doc] for doc in docs]
+        docs = [ ' '.join(doc) for doc in docs]
         return docs
+
 
 
 class SimplePreprocessingBR_Lite:
@@ -299,24 +282,35 @@ class SimplePreprocessingBR_Lite:
         )
         self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
         self._min_word_size = min_word_size
-        self._huge_mem = huge_mem
+        # self._huge_mem = huge_mem
         # self._use_spacy = use_spacy
         # print("Gonna use {} as lemmatizer!".format( 'spacy' if use_spacy else 'nltk' ))
 
 
-    def transform(self, docs,):
-        tokenizer = RegexpTokenizer(r'\w+')
+    def transform(self, docs, express=False):
+        tokenizer = RegexpTokenizer(r'\w{4, }')
+
+        for idx in range(len(docs)):
+            if not express:
+                docs[idx] = docs[idx].lower()  # Convert to lowercase.
+                docs[idx] = self._pattern.sub('', docs[idx])  # remove stopwords
+                docs[idx] = re.sub(r'[^a-z]+',' ', docs[idx]) # remove non-alphabet characters            
+            docs[idx] = tokenizer.tokenize(docs[idx])  # Split into words.
         
-        docs = (
-            re.findall(
-                r'\w{'+str(self._min_word_size)+r',}',
-                self._pattern.sub('', doc.lower()),
-                re.IGNORECASE
-            )
-            for doc in docs
-        )
+        # docs = (
+        #     re.findall(
+        #         r'\w{'+str(self._min_word_size)+r',}',
+        #         self._pattern.sub('', doc.lower()),
+        #         re.IGNORECASE
+        #     )
+        #     for doc in docs
+        # )
 
         lemmatizer = WordNetLemmatizer()
 
-        return [' '.join([lemmatizer.lemmatize(token) for token in doc]) for doc in docs]
+        # return [' '.join([lemmatizer.lemmatize(token) for token in doc]) for doc in docs]
+        docs = [[lemmatizer.lemmatize(token) for token in doc] for doc in docs]
+        docs = [ ' '.join(doc) for doc in docs]
+        return docs
+
 
