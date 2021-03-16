@@ -279,7 +279,7 @@ class SimplePreprocessing_MemConstrained:
 
 
     def transform(self, docs):
-        tokenizer = RegexpTokenizer(r'\w{4, }')
+        tokenizer = RegexpTokenizer(r'\w+')
         lemmatizer = WordNetLemmatizer()
 
         for idx, doc in enumerate(docs):
@@ -293,7 +293,7 @@ class SimplePreprocessing_MemConstrained:
             doc = self._pattern.sub('',doc)  # remove stopwords
             doc = re.sub(r'[^a-z]+', ' ', doc) # remove non-alphabet characters
             doc = tokenizer.tokenize(doc)  # Split into words.
-            doc = ' '.join([lemmatizer.lemmatize(token) for token in doc])
+            doc = ' '.join([lemmatizer.lemmatize(token) for token in doc if len(token) > 3])
             docs[idx] = doc
 
         return docs
