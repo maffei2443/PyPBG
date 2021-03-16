@@ -264,6 +264,41 @@ class SimplePreprocessing:
         return docs
 
 
+class SimplePreprocessing_MemConstrained:
+
+    def __init__(self, use_nltk=True, extra_stop_words=[],
+        min_word_size=4, huge_mem=False, **kargs):
+        self.use_nltk = use_nltk
+        self.extra_stop_words = extra_stop_words
+        self._stopwords = set(
+            nltk.corpus.stopwords.words('portuguese') if self.use_nltk else []
+            + extra_stop_words
+        )
+        self._pattern = re.compile(r'\b(' + r'|'.join(self._stopwords) + r')\b\s*')
+        self._min_word_size = min_word_size
+
+
+    def transform(self, docs):
+        tokenizer = RegexpTokenizer(r'\w{4, }')
+        lemmatizer = WordNetLemmatizer()
+
+        for idx, doc in enumerate(docs):
+            
+            # docs[idx] = docs[idx].lower()  # Convert to lowercase.
+            # docs[idx] = self._pattern.sub('',docs[idx])  # remove stopwords
+            # docs[idx] = re.sub(r'[^a-z]',' ',docs[idx]) # remove non-alphabet characters
+            # docs[idx] = tokenizer.tokenize(docs[idx])  # Split into words.
+
+            doc = doc.lower()  # Convert to lowercase.
+            doc = self._pattern.sub('',doc)  # remove stopwords
+            doc = re.sub(r'[^a-z]+', ' ', doc) # remove non-alphabet characters
+            doc = tokenizer.tokenize(doc)  # Split into words.
+            doc = ' '.join([lemmatizer.lemmatize(token) for token in doc])
+            docs[idx] = doc
+
+        return docs
+
+
 
 class SimplePreprocessingBR_Lite:
 
