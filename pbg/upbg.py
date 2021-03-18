@@ -28,6 +28,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
         self.save_interval = save_interval
 
     def local_propag(self, j):
+        print("\tLocal propagation starts...")
         local_niter = 0
         words = [x for x in self.X[j].nonzero()[1]]
         log_F = np.log(self.X[j, words].toarray().T)
@@ -50,6 +51,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
                 #print('convergiu itr %s' %local_niter)
                 break
         self.log_A[j] = log_Aj
+        print("\tLocal propagation ends...")
 
     def local_supress(self, log_C, pos_idx):
         # if not self.unlabeled[j]:
@@ -65,13 +67,15 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
 
     def global_propag(self):
-        for i in tqdm(range(self.nwords), ascii=True, desc='global propagation:   '):
+        print(f"Global propagation...")
+        for i in range(self.nwords):
             docs = [d for d in self.Xc[:, i].nonzero()[0]]
             log_F = np.log(self.X[docs, i].toarray())
             log_C = self.log_A[docs] + self.log_B[i]
             log_C = log_C - logsumexp(log_C, axis=1, keepdims=True)
             self.log_B[i] = logsumexp(log_F + log_C, axis=0)
             #w_cls = self.map_word_class.get(i,-1)
+        print("End global propagation...")
         self.log_B = self.log_B - logsumexp(self.log_B, axis=0)
         self.log_B = np.log(self.beta + np.exp(self.log_B))
 
@@ -136,14 +140,16 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
     def bgp(self, labelled=None):
         global_niter = 0
+        
         while global_niter < self.global_max_itr:
-            for j in tqdm(range(self.ndocs), ascii=True, desc=f'docs processed (itr {global_niter})'):
+            for j in range(self.ndocs):
                 self.local_propag(j)
                 # if not self.unlabeled[j]:
                 #    self.supress3(j)
             self.global_propag()
             global_niter += 1
             # self.print_top_topics()
+        
 
     def supress3(self, j):
         #cls = self.classes_[self.y[j]]
