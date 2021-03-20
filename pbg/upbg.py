@@ -28,7 +28,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
         self.save_interval = save_interval
 
     def local_propag(self, j):
-        print("\tLocal propagation starts...")
+        # print("\tLocal propagation starts...")
         local_niter = 0
         words = [x for x in self.X[j].nonzero()[1]]
         log_F = np.log(self.X[j, words].toarray().T)
@@ -51,7 +51,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
                 #print('convergiu itr %s' %local_niter)
                 break
         self.log_A[j] = log_Aj
-        print("\tLocal propagation ends...")
+        # print("\tLocal propagation ends...")
 
     def local_supress(self, log_C, pos_idx):
         # if not self.unlabeled[j]:
