@@ -1,9 +1,9 @@
-name: pbg_topics
+name: pbg
 
 conda_env: conda.yaml
 
 entry_points:
-  main:
+  jurix:
     parameters:
       n_components: {type: int, default: 50}
       alpha: {type: float, default: 0.005}
@@ -34,3 +34,34 @@ entry_points:
                 --huge_mem={huge_mem} \
                 --data_size={data_size} \
                 "
+  main:
+    parameters:
+      n_components: {type: int, default: 50}
+      alpha: {type: float, default: 0.005}
+      beta: {type: float, default: 0.001}
+      local_max_itr: {type: int, default: 20}
+      global_max_itr: {type: int, default: 50}
+      local_threshold: {type: float, default: 1e-6}
+      global_threshold: {type: float, default: 1e-6}
+      ngram_min: {type: int, default: 1}
+      ngram_max: {type: int, default: 1}
+      lines_percentage: {type: float, default: 1.0}
+      data_size: {type: str, default: 'small'}
+      use_cache: {type: int, default: 1}
+      log_model: {type: int, default: 0}
+
+    command: " python main.py \                
+                --n_components={n_components} \
+                --alpha={alpha} \
+                --beta={beta} \
+                --local_max_itr={local_max_itr} \
+                --global_max_itr={global_max_itr} \
+                --local_threshold={local_threshold} \
+                --global_threshold={global_threshold} \
+                --ngram_min={ngram_min} \
+                --ngram_max={ngram_max} \
+                --lines_percentage={lines_percentage} \
+                --data_size={data_size} \
+                --use_cache={use_cache} \
+                --log_model={log_model} \
+            "

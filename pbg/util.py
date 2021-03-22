@@ -15,7 +15,17 @@ import re
 import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-# import spacy
+
+def dict_to_mlflow_params(d):
+    """Returns a string containing parameters for the `mlflw run` command.
+    Ex:
+    >> d = {'a': 123, 'b': 'param'}
+    >> dict_to_mlflow_params(d)
+    '-P a=123 -P b=param'
+    """
+    return ' '.join((f'-P {k}={v}' for (k, v) in d.items()))
+
+
 
 class Loader:
 

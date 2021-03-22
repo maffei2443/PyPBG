@@ -10,7 +10,8 @@ class UPBG(BaseEstimator, ClassifierMixin):
 
     def __init__(self, n_components, alpha=0.05, beta=0.0001, local_max_itr=50,
                  global_max_itr=50, local_threshold=1e-6, global_threshold=1e-6,
-                 save_interval=-1, is_semisupervised=True, feature_names=None):
+                 save_interval=-1, is_semisupervised=True, feature_names=None, debug=False,
+                 **kargs):
         self.n_components = n_components
         self.alpha = alpha
         self.log_alpha = np.log(alpha)
@@ -26,6 +27,7 @@ class UPBG(BaseEstimator, ClassifierMixin):
         self.free_id = set(range(n_components))  # list of index position
         self.map_word_class = {}  # dict of list of class, key=word_id, value=list of classes
         self.save_interval = save_interval
+        self._debug = debug
 
     def local_propag(self, j):
         # print("\tLocal propagation starts...")
@@ -148,7 +150,9 @@ class UPBG(BaseEstimator, ClassifierMixin):
                 #    self.supress3(j)
             self.global_propag()
             global_niter += 1
-            # self.print_top_topics()
+            if self._debug:
+                self.print_top_topics()
+                print("\n")
         
 
     def supress3(self, j):
@@ -182,14 +186,20 @@ class UPBG(BaseEstimator, ClassifierMixin):
         self.inv_map_class_ = {v: k for k, v in self.map_class_.items()}
         if self.feature_names is None:
             return
+        if self._debug:
+            print('\n')
         for k, topic in enumerate(self.log_B.transpose()):
             l_ = [self.feature_names[i]
                   for i in topic.argsort()[:-n_top_words - 1: -1]]
             cls_id = self.inv_map_class_.get(k, -1)
+            if self._debug:
+                print('\t', end='')
             if cls_id == -1 or target_name is None:
                 print(f'topic {k}: ' + ', '.join(l_))
             else:
                 print(f'topic {k} [{target_name[cls_id]}]: ' + ', '.join(l_))
+        if self._debug:
+            print('\n')
 
     def get_topics(self, n_top_words=10, feature_names=None):
         if feature_names == None:
