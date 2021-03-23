@@ -7,8 +7,13 @@ for id in $(ls "mlruns/0"); do
     echo "RUN_ID: $id"
     prf="mlruns/0/$id/params"
     for p in $(ls $prf); do
-        printf "\t%s: " "${p##*/}";
+        printf "\t $id %s: " "${p##*/}";
         echo $(cat "$prf/$p");
     done;
 done
+
+
+
+
+
 

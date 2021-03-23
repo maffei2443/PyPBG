@@ -217,10 +217,13 @@ preprocessed_path = f'preprocessed/train_{DATA_SIZE}_{LINES_PERCENTAGE:.2f}.pkl'
 use_cache = dict_args.pop('use_cache', )
 print("USE_CACHE:", str(use_cache))
 print("PREPROCESSED_PATH:", preprocessed_path)
-if not use_cache:
+
+if not use_cache or not os.path.isfile(preprocessed_path):
+    print("use_cache: ", use_cache)
+    print("os.path.isfile(preprocessed_path): ", os.path.isfile(preprocessed_path))
     pp = util.SimplePreprocessing_MemConstrained(**params)
     M_train = pp.transform(train_data.body)
-    print("Dumping proprocessed_train...")
+    print("Dumping preprocessed_train...")
     os.makedirs('preprocessed', exist_ok=True)
     pickle.dump(M_train, open(preprocessed_path, 'wb'))
 
